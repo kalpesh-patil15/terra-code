@@ -50,3 +50,25 @@ module "test-pub" {
     Terraform   = "true"
   }
 }
+
+
+#ec2 public
+module "test-pvt" {
+  source  = "terraform-aws-modules/ec2-instance/aws"
+  version = "~> 3.0"
+
+#  name = test-pvt
+
+
+  ami                    = "ami-01a4f99c4ac11b03c"
+  instance_type          = "t2.micro"
+  key_name               = "test-key1"
+  monitoring             = true
+#  vpc_security_group_ids = ["sg-12345678"]
+  subnet_id              =  element(module.vpc.public_subnets, 1)
+
+  tags = {
+    Terraform   = "true"
+  }
+}
+
