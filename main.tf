@@ -43,7 +43,7 @@ module "test-pub" {
   instance_type          = "t2.micro"
   key_name               = "test-key1"
   monitoring             = true
-#  vpc_security_group_ids = ["sg-12345678"]
+#  vpc_security_group_ids = ["aws_security_group.test-sg.id"]
   subnet_id              =  element(module.vpc.public_subnets, 0) 
 
   tags = {
@@ -52,7 +52,7 @@ module "test-pub" {
 }
 
 
-#ec2 public
+#ec2 pvt 
 module "test-pvt" {
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "~> 3.0"
@@ -64,11 +64,37 @@ module "test-pvt" {
   instance_type          = "t2.micro"
   key_name               = "test-key1"
   monitoring             = true
-#  vpc_security_group_ids = ["sg-12345678"]
-  subnet_id              =  element(module.vpc.public_subnets, 1)
+#  vpc_security_group_ids = ["aws_security_group.test-sg.id"]
+  subnet_id              =  element(module.vpc.private_subnets, 1)
 
   tags = {
     Terraform   = "true"
   }
 }
 
+
+resource "aws_security_group" "test-sg" {
+  name        = "test-sg"
+  description = "Allow SSH access"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+#  ingress {
+#    from_port   = 80
+#    to_port     = 80
+#    protocol    = "tcp"
+#    cidr_blocks = ["0.0.0.0/0"]
+#  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
